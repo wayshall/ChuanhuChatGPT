@@ -1,6 +1,8 @@
 from ..utils import *
 from .base_model import BaseLLMModel
 from zhipuai import ZhipuAI
+from ..index_func import *
+from ..config import default_chuanhu_assistant_model
 
 
 class ZhipuAIClient(BaseLLMModel):
@@ -73,4 +75,41 @@ class ZhipuAIClient(BaseLLMModel):
             )
             return input_token_count + system_prompt_token_count
         return input_token_count
+
+    def summarize_index(self, files, chatbot, language):
+        from modules.token_text_spliter_mapping import set_cache_dir_and_change_mapping
+        set_cache_dir_and_change_mapping()
+
+        status = gr.Markdown.update()
+        if files:
+            index = construct_index(None, file_src=files)
+            status = i18n("总结完成")
+            logging.info(i18n("生成内容总结中……"))
+            os.environ["OPENAI_API_KEY"] = self.api_key
+            from langchain.callbacks import StdOutCallbackHandler
+            from langchain.chains.summarize import load_summarize_chain
+            from langchain.prompts import PromptTemplate
+            from .ZhipuAIChat import ChatZhipuAI
+
+            prompt_template = (
+                "Write a concise summary of the following:\n\n{text}\n\nCONCISE SUMMARY IN "
+                + language
+                + ":"
+            )
+            PROMPT = PromptTemplate(template=prompt_template, input_variables=["text"])
+            llm = ChatZhipuAI(zhipuai_api_key=self.api_key, model_name=default_chuanhu_assistant_model)
+            chain = load_summarize_chain(
+                llm,
+                chain_type="map_reduce",
+                return_intermediate_steps=True,
+                map_prompt=PROMPT,
+                combine_prompt=PROMPT,
+            )
+            summary = chain(
+                {"input_documents": list(index.docstore.__dict__["_dict"].values())},
+                return_only_outputs=True,
+            )["output_text"]
+            print(i18n("总结") + f": {summary}")
+            chatbot.append([i18n("上传了") + str(len(files)) + "个文件", summary])
+        return chatbot, status
 

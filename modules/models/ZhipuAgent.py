@@ -39,7 +39,7 @@ from langchain.callbacks import get_openai_callback
 import os
 import gradio as gr
 import logging
-from ZhipuAIChat import ChatZhipuAI
+from .ZhipuAIChat import ChatZhipuAI
 
 SUMMARIZE_PROMPT_CN = """写出以下内容的简洁摘要：
 

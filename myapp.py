@@ -820,6 +820,9 @@ demo.title = i18n("云微AI Chat")
 if __name__ == "__main__":
     reload_javascript()
     setup_wizard()
+    from modules.token_text_spliter_mapping import set_cache_dir_and_change_mapping
+    set_cache_dir_and_change_mapping()
+
     demo.queue(concurrency_count=CONCURRENT_COUNT).launch(
         allowed_paths=["history", "web_assets"],
         blocked_paths=["config.json", "files", "models", "lora", "modules"],

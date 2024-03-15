@@ -127,7 +127,7 @@ def construct_index(
                                           model=os.environ["AZURE_EMBEDDING_MODEL_NAME"], openai_api_base=os.environ["AZURE_OPENAI_API_BASE_URL"], openai_api_type="azure")
     if os.path.exists(index_path) and load_from_cache_if_possible:
         logging.info(i18n("找到了缓存的索引文件，加载中……"))
-        return FAISS.load_local(index_path, embeddings)
+        return FAISS.load_local(index_path, embeddings, allow_dangerous_deserialization=True)
     else:
         documents = get_documents(file_src)
         logging.debug(i18n("构建索引中……"))

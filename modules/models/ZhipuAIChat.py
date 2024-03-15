@@ -315,6 +315,7 @@ class ChatZhipuAI(BaseChatModel):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.zhipuai_api_key = kwargs["zhipuai_api_key"]
         try:
             from zhipuai import ZhipuAI
 
