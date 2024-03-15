@@ -16,7 +16,7 @@ pandas
 commentjson
 openpyxl
 pandoc
-wolframalpha
+wolframalphaw
 faiss-cpu==1.7.4
 duckduckgo-search>=4.1.1
 arxiv
@@ -35,3 +35,5 @@ anthropic==0.18.1
 Pillow>=10.1.0
 protobuf==3.20.3
 ollama>=0.1.6
+gradio[oauth]
+zhipuai

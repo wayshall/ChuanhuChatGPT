@@ -8,12 +8,14 @@ from tqdm import tqdm
 from modules.presets import *
 from modules.utils import *
 from modules.config import local_embedding
-
+from .token_text_spliter_mapping import set_cache_dir_and_change_mapping
 
 def get_documents(file_src):
+    set_cache_dir_and_change_mapping()
     from langchain.schema import Document
     from langchain.text_splitter import TokenTextSplitter
-    text_splitter = TokenTextSplitter(chunk_size=500, chunk_overlap=30)
+    # text_splitter = TokenTextSplitter(chunk_size=500, chunk_overlap=30)
+    text_splitter = TokenTextSplitter(chunk_size=500, chunk_overlap=30, model_name="text-embedding-ada-002")
 
     documents = []
     logging.debug("Loading documents...")
@@ -111,7 +113,10 @@ def construct_index(
     if local_embedding:
         from langchain.embeddings.huggingface import HuggingFaceEmbeddings
         embeddings = HuggingFaceEmbeddings(
-            model_name="sentence-transformers/distiluse-base-multilingual-cased-v2")
+            # model_name="sentence-transformers/distiluse-base-multilingual-cased-v2"
+            # 网络有问题，修改为本地
+            model_name = "/Users/way/mydev/llm/models/distiluse-base-multilingual-cased-v2"
+        )
     else:
         from langchain.embeddings import OpenAIEmbeddings
         if os.environ.get("OPENAI_API_TYPE", "openai") == "openai":

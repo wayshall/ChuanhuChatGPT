@@ -190,6 +190,9 @@ for x in ["GOOGLE_CSE_ID", "GOOGLE_API_KEY", "WOLFRAM_ALPHA_APPID", "SERPAPI_API
     if config.get(x, None) is not None:
         os.environ[x] = config[x]
 
+zhipu_api_key = config.get("zhipu_api_key", "")
+os.environ["ZHIPU_API_KEY"] = zhipu_api_key
+
 
 @contextmanager
 def retrieve_openai_api(api_key=None):

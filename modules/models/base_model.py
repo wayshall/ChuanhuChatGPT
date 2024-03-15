@@ -148,6 +148,8 @@ class ModelType(Enum):
     GoogleGemini = 19
     GoogleGemma = 20
     Ollama = 21
+    GLM4 = 22
+    ZhipuAgent = 23
 
     @classmethod
     def get_type(cls, model_name: str):
@@ -198,6 +200,10 @@ class ModelType(Enum):
             model_type = ModelType.DALLE3
         elif "gemma" in model_name_lower:
             model_type = ModelType.GoogleGemma
+        elif "glm-4" in model_name_lower:
+            model_type = ModelType.GLM4
+        elif "云微助理" in model_name_lower:
+            model_type = ModelType.ZhipuAgent
         else:
             model_type = ModelType.LLaMA
         return model_type
