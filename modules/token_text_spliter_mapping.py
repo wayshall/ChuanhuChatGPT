@@ -7,8 +7,8 @@ from tiktoken_ext.openai_public import ENCODING_CONSTRUCTORS, ENDOFTEXT, FIM_PRE
 def set_cache_dir_and_change_mapping():
     os.environ["TIKTOKEN_CACHE_DIR"] = "/Users/way/mydev/llm/models/tiktoken_cache"
     os.environ["SENTENCE_TRANSFORMERS_HOME"] = "/Users/way/mydev/llm/models/tiktoken_cache"
-    ENCODING_CONSTRUCTORS["gpt2"] = local_gpt2
-    ENCODING_CONSTRUCTORS["cl100k_base"] = cl100k_base_local
+    # ENCODING_CONSTRUCTORS["gpt2"] = local_gpt2
+    # ENCODING_CONSTRUCTORS["cl100k_base"] = cl100k_base_local
 
 def local_gpt2():
     mergeable_ranks = data_gym_to_mergeable_bpe_ranks(

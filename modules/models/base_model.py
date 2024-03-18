@@ -150,6 +150,7 @@ class ModelType(Enum):
     Ollama = 21
     GLM4 = 22
     ZhipuAgent = 23
+    DASHSCOPE = 24
 
     @classmethod
     def get_type(cls, model_name: str):
@@ -192,6 +193,8 @@ class ModelType(Enum):
             model_type = ModelType.Spark
         elif "claude" in model_name_lower:
             model_type = ModelType.Claude
+        elif "qwen-" in model_name_lower:
+            model_type = ModelType.DASHSCOPE
         elif "qwen" in model_name_lower:
             model_type = ModelType.Qwen
         elif "ernie" in model_name_lower:

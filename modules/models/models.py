@@ -149,6 +149,11 @@ def get_model(
             from .GoogleGemma import GoogleGemmaClient
             model = GoogleGemmaClient(
                 model_name, access_key, user_name=user_name)
+        elif model_type == ModelType.DASHSCOPE:
+            from .Dashscope import DashscopeClient
+            dashscope_api_key = config.dashscope_api_key
+            model = DashscopeClient(
+                model_name, dashscope_api_key, user_name=user_name)
         elif model_type == ModelType.GLM4:
             from .ZhipuAI import ZhipuAIClient
             zhipu_api_key = os.environ.get("ZHIPU_API_KEY")

@@ -221,6 +221,9 @@ else:
 
 MODELS = [
     "glm-4",
+    "qwen-turbo",
+    "qwen-plus",
+    "qwen-max",
     "ERNIE-Bot-turbo",
     "ERNIE-Bot",
     "ERNIE-Bot-4",
