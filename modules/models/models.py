@@ -159,10 +159,14 @@ def get_model(
             zhipu_api_key = os.environ.get("ZHIPU_API_KEY")
             model = ZhipuAIClient(
                 model_name, zhipu_api_key, user_name=user_name)
-        elif model_type == ModelType.ZhipuAgent:
-            from .ZhipuAgent import ZhipuAgent_Client
-            zhipu_api_key = os.environ.get("ZHIPU_API_KEY")
-            model = ZhipuAgent_Client(model_name, zhipu_api_key, user_name=user_name)
+        elif model_type == ModelType.MyAgent:
+            # from .ZhipuAgent import ZhipuAgent_Client
+            # zhipu_api_key = os.environ.get("ZHIPU_API_KEY")
+            # model = ZhipuAgent_Client(model_name, zhipu_api_key, user_name=user_name)
+
+            from .DashscopeAgent import DashscopeAgent_Client
+            dashscope_api_key = config.dashscope_api_key
+            model = DashscopeAgent_Client(model_name, dashscope_api_key, user_name=user_name)
             msg = i18n("启用的工具：") + ", ".join([i.name for i in model.tools])
         elif model_type == ModelType.Unknown:
             raise ValueError(f"Unknown model: {model_name}")

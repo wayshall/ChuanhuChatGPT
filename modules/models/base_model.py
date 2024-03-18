@@ -149,7 +149,7 @@ class ModelType(Enum):
     GoogleGemma = 20
     Ollama = 21
     GLM4 = 22
-    ZhipuAgent = 23
+    MyAgent = 23
     DASHSCOPE = 24
 
     @classmethod
@@ -206,7 +206,7 @@ class ModelType(Enum):
         elif "glm-4" in model_name_lower:
             model_type = ModelType.GLM4
         elif "云微助理" in model_name_lower:
-            model_type = ModelType.ZhipuAgent
+            model_type = ModelType.MyAgent
         else:
             model_type = ModelType.LLaMA
         return model_type
@@ -543,10 +543,12 @@ class BaseLLMModel:
                         proxies["https"] = proxy[1]
                 else:
                     proxies = None
-                with DDGS(proxies=proxies) as ddgs:
-                    ddgs_gen = ddgs.text(fake_inputs, backend="lite")
-                    for r in islice(ddgs_gen, 10):
-                        search_results.append(r)
+
+                if proxies:
+                    with DDGS(proxies=proxies) as ddgs:
+                        ddgs_gen = ddgs.text(fake_inputs, backend="lite")
+                        for r in islice(ddgs_gen, 10):
+                            search_results.append(r)
             reference_results = []
             for idx, result in enumerate(search_results):
                 logging.debug(f"搜索结果{idx + 1}：{result}")

@@ -39,7 +39,8 @@ from langchain.callbacks import get_openai_callback
 import os
 import gradio as gr
 import logging
-from .ZhipuAIChat import ChatZhipuAI
+import dashscope
+from langchain_community.llms import Tongyi
 
 SUMMARIZE_PROMPT_CN = """写出以下内容的简洁摘要：
 
@@ -58,13 +59,15 @@ class WebAskingInput(BaseModel):
     question: str = Field(description="Question that you want to know the answer to, based on the webpage's content.")
 
 
-class ZhipuAgent_Client(BaseLLMModel):
-    def __init__(self, model_name, zhipuai_api_key, user_name="") -> None:
+class DashscopeAgent_Client(BaseLLMModel):
+    def __init__(self, model_name, dashscope_api_key, user_name="") -> None:
         super().__init__(model_name=model_name, user=user_name)
         self.text_splitter = TokenTextSplitter(chunk_size=500, chunk_overlap=30)
-        self.api_key = zhipuai_api_key
-        self.llm = ChatZhipuAI(zhipuai_api_key=zhipuai_api_key, model_name=default_chuanhu_assistant_model)
-        self.cheap_llm = ChatZhipuAI(zhipuai_api_key=zhipuai_api_key, model_name="glm-3")
+        self.api_key = dashscope_api_key
+        os.environ["DASHSCOPE_API_KEY"] = self.api_key
+        dashscope.api_key = self.api_key
+        self.llm = Tongyi(model_name="qwen-plus")
+        self.cheap_llm = Tongyi(model_name="qwen-turbo")
         # PROMPT = PromptTemplate(template=SUMMARIZE_PROMPT, input_variables=["text"])
         PROMPT = PromptTemplate(template=SUMMARIZE_PROMPT_CN, input_variables=["text"])
         self.summarize_chain = load_summarize_chain(self.cheap_llm, chain_type="map_reduce", return_intermediate_steps=True, map_prompt=PROMPT, combine_prompt=PROMPT)
@@ -146,7 +149,7 @@ class ZhipuAgent_Client(BaseLLMModel):
                 from langchain.chat_models import ChatOpenAI
                 prompt_template = "Write a concise summary of the following:\n\n{text}\n\nCONCISE SUMMARY IN " + language + ":"
                 PROMPT = PromptTemplate(template=prompt_template, input_variables=["text"])
-                llm = ChatZhipuAI(zhipuai_api_key=self.api_key, model_name=self.model_name)
+                llm = Tongyi()
                 chain = load_summarize_chain(llm, chain_type="map_reduce", return_intermediate_steps=True, map_prompt=PROMPT, combine_prompt=PROMPT)
                 summary = chain({"input_documents": list(index.docstore.__dict__["_dict"].values())}, return_only_outputs=True)["output_text"]
                 logging.info(f"Summary: {summary}")
