@@ -151,6 +151,7 @@ class ModelType(Enum):
     GLM4 = 22
     MyAgent = 23
     DASHSCOPE = 24
+    Kimi = 25
 
     @classmethod
     def get_type(cls, model_name: str):
@@ -207,6 +208,8 @@ class ModelType(Enum):
             model_type = ModelType.GLM4
         elif "云微助理" in model_name_lower:
             model_type = ModelType.MyAgent
+        elif "moonshot" in model_name_lower:
+            model_type = ModelType.Kimi
         else:
             model_type = ModelType.LLaMA
         return model_type

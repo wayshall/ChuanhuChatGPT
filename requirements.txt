@@ -38,3 +38,4 @@ ollama>=0.1.6
 gradio[oauth]
 zhipuai
 dashscope
+openai

@@ -159,6 +159,10 @@ def get_model(
             zhipu_api_key = os.environ.get("ZHIPU_API_KEY")
             model = ZhipuAIClient(
                 model_name, zhipu_api_key, user_name=user_name)
+        elif model_type == ModelType.Kimi:
+            from .KimiAI import KimiAIClient
+            kimi_api_key = os.environ.get("KIMI_API_KEY")
+            model = KimiAIClient(model_name, kimi_api_key, user_name=user_name)
         elif model_type == ModelType.MyAgent:
             # from .ZhipuAgent import ZhipuAgent_Client
             # zhipu_api_key = os.environ.get("ZHIPU_API_KEY")

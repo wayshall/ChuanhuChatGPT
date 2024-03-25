@@ -430,7 +430,9 @@ with gr.Blocks(theme=small_and_beautiful_theme) as demo:
 
                     with gr.Tab(label=i18n("关于"), elem_id="about-tab"):
                         gr.Markdown(
-                            '<img alt="Chuanhu Chat logo" src="file=web_assets/icon/any-icon-512.png" style="max-width: 144px;">')
+                            # '<img alt="Chuanhu Chat logo" src="file=web_assets/icon/any-icon-512.png" style="max-width: 144px;">'
+                            '<img alt="Chuanhu Chat logo" src="file=web_assets/my_chatbot.png" style="max-width: 144px;">'
+                        )
                         gr.Markdown("# "+i18n("川虎Chat"))
                         gr.HTML(get_html("footer.html").format(
                             versions=versions_html()), elem_id="footer")
@@ -830,6 +832,6 @@ if __name__ == "__main__":
         server_port=server_port,
         share=share,
         auth=auth_from_conf if authflag else None,
-        favicon_path="./web_assets/favicon.ico",
+        favicon_path="./web_assets/favicon2.ico",
         inbrowser=autobrowser and not dockerflag,  # 禁止在docker下开启inbrowser
     )

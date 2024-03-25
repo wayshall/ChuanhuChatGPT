@@ -195,6 +195,9 @@ os.environ["ZHIPU_API_KEY"] = zhipu_api_key
 
 dashscope_api_key = config.get("dashscope_api_key", "")
 
+kimi_api_key = config.get("kimi_api_key", "")
+os.environ["KIMI_API_KEY"] = kimi_api_key
+
 
 @contextmanager
 def retrieve_openai_api(api_key=None):

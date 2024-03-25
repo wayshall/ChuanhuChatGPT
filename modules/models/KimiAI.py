@@ -2,27 +2,15 @@ from ..utils import *
 from .base_model import BaseLLMModel
 from ..index_func import *
 from ..config import default_chuanhu_assistant_model
-import dashscope
-from langchain_community.llms import Tongyi
+from openai import OpenAI
 
-"""
-阿里通义千问api实现
-项目里的QWen实现是基于阿里开源的本地模型的实现，这里使用的是阿里云的千问api实现。
-"""
-
-dashscope_models = {
-    "qwen-turbo": dashscope.Generation.Models.qwen_turbo,
-    "qwen-plus": dashscope.Generation.Models.qwen_plus,
-    "qwen-max": dashscope.Generation.Models.qwen_max,
-    "qwen-bailian-v1": dashscope.Generation.Models.bailian_v1
-}
-class DashscopeClient(BaseLLMModel):
+class KimiAIClient(BaseLLMModel):
     def __init__(
         self,
         model_name,
         api_key,
         system_prompt=INITIAL_SYSTEM_PROMPT,
-        temperature=1.0,
+        temperature=0.3,
         top_p=1.0,
         user_name=""
     ) -> None:
@@ -35,9 +23,7 @@ class DashscopeClient(BaseLLMModel):
         )
         self.api_key = api_key
         self.need_api_key = True
-        os.environ["DASHSCOPE_API_KEY"] = self.api_key
-        dashscope.api_key = self.api_key
-        self.client = dashscope.Generation
+        self.client = OpenAI(api_key=self.api_key, base_url="https://api.moonshot.cn/v1",)
         if system_prompt is not None:
             self.system_prompt = system_prompt
 
@@ -48,7 +34,9 @@ class DashscopeClient(BaseLLMModel):
         if response is not None:
             partial_text = ""
             for chunk in response:
-                partial_text += chunk.output.choices[0]["message"]["content"]
+                if not chunk.choices[0].delta.content:
+                    continue
+                partial_text += chunk.choices[0].delta.content
                 yield partial_text
         else:
             yield STANDARD_ERROR_MSG + GENERAL_ERROR_MSG
@@ -56,7 +44,7 @@ class DashscopeClient(BaseLLMModel):
     def get_answer_at_once(self):
         response = self._get_response()
         # response = json.loads(response.text)
-        content = response.output.choices[0]["message"]["content"]
+        content = response["choices"][0]["message"]["content"]
         total_token_count = response["usage"]["total_tokens"]
         return content, total_token_count
 
@@ -72,15 +60,23 @@ class DashscopeClient(BaseLLMModel):
         if system_prompt is not None and len(system_prompt.strip())>0:
             history = [construct_system(system_prompt), *history]
 
-        response=self.client.call(
-            dashscope_models[self.model_name],
+        response=self.client.chat.completions.create(
+            model=self.model_name,
             messages=history,
-            result_format="message",
             stream=stream,
-            incremental_output=stream
+            temperature=self.temperature
         )
 
         return response
+
+    def count_token(self, user_input):
+        input_token_count = count_token(construct_user(user_input))
+        if self.system_prompt is not None and len(self.all_token_counts) == 0:
+            system_prompt_token_count = count_token(
+                construct_system(self.system_prompt)
+            )
+            return input_token_count + system_prompt_token_count
+        return input_token_count
 
     def summarize_index(self, files, chatbot, language):
         from modules.token_text_spliter_mapping import set_cache_dir_and_change_mapping
@@ -95,7 +91,8 @@ class DashscopeClient(BaseLLMModel):
             from langchain.callbacks import StdOutCallbackHandler
             from langchain.chains.summarize import load_summarize_chain
             from langchain.prompts import PromptTemplate
-            from .ZhipuAIChat import ChatZhipuAI
+            # from langchain_community.llms import OpenAIChat
+            from langchain.chat_models import ChatOpenAI
 
             prompt_template = (
                 "Write a concise summary of the following:\n\n{text}\n\nCONCISE SUMMARY IN "
@@ -103,7 +100,11 @@ class DashscopeClient(BaseLLMModel):
                 + ":"
             )
             PROMPT = PromptTemplate(template=prompt_template, input_variables=["text"])
-            llm = Tongyi(model_name=self.model_name)
+            llm = ChatOpenAI(
+                model_name=self.model_name,
+                openai_api_key=self.api_key,
+                openai_api_base="https://api.moonshot.cn/v1",
+            )
             chain = load_summarize_chain(
                 llm,
                 chain_type="map_reduce",
