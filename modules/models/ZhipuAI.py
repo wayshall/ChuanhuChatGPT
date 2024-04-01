@@ -62,7 +62,15 @@ class ZhipuAIClient(BaseLLMModel):
         response=self.client.chat.completions.create(
             model=self.model_name,
             messages=history,
-            stream=stream
+            stream=stream,
+            tools=[
+                {
+                    "type": "web_search",
+                    "web_search": {
+                        "enable": True
+                    }
+                }
+            ]
         )
 
         return response

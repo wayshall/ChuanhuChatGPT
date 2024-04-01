@@ -77,7 +77,8 @@ class DashscopeClient(BaseLLMModel):
             messages=history,
             result_format="message",
             stream=stream,
-            incremental_output=stream
+            incremental_output=stream,
+            enable_search=True
         )
 
         return response

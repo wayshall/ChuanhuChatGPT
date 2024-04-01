@@ -508,7 +508,7 @@ def filter_history(user_name, keyword):
 
 
 def load_template(filename, mode=0):
-    logging.debug(f"加载模板文件{filename}，模式为{mode}（0为返回字典和下拉菜单，1为返回下拉菜单，2为返回字典）")
+    logging.info(f"加载模板文件{filename}，模式为{mode}（0为返回字典和下拉菜单，1为返回下拉菜单，2为返回字典）")
     lines = []
     if filename.endswith(".json"):
         with open(os.path.join(TEMPLATES_DIR, filename), "r", encoding="utf8") as f:
@@ -527,6 +527,10 @@ def load_template(filename, mode=0):
         return {row[0]: row[1] for row in lines}
     else:
         choices = sorted_by_pinyin([row[0] for row in lines])
+        # 直接返回choices列表前端会有一个bug：templateSelectDropdown 的下拉框只显示选项的第一个字符，比如选项是“扮演魔法师”，结果先显示“扮”
+        # 这应该是templateSelectDropdown对应的Dropdown组件把choices属性的值里的元素识别为了tuple类型导致的（选项显示的是tuple[0]，然而选项的元素实际上是str类型，所以只显示了第一个字符）
+        # 所以这里增加一句代码把choice转换为tuple类型，以修复这个bug
+        choices = [(c, c) for c in choices]
         return {row[0]: row[1] for row in lines}, gr.Dropdown.update(choices=choices)
 
 
